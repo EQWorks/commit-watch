@@ -1,0 +1,28 @@
+{
+  "name": "@eqworks/commit-watch",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "source": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "commit-watch": "./index.js"
+  },
+  "repository": "git@github.com:EQWorks/commit-watch.git",
+  "author": "EQ Devs <dev@eqworks.com>",
+  "scripts": {
+    "lint": "eslint .",
+    "prepublishOnly": "npm run lint"
+  },
+  "dependencies": {
+    "yargs": "^17.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0"
+  }
+}
