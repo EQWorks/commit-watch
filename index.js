@@ -37,7 +37,7 @@ if (require.main === module) {
     }
   } catch (e) {
     if (verbose) {
-      console.error(e)
+      console.error(e.message)
     }
     process.exit(1)
   }
