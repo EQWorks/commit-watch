@@ -8,23 +8,48 @@ const chalk = require('chalk')
 const R = /(?<cat>\S+?)(\/(?<t2>\S+))? - (?<title>.*)/
 
 const SEV_COLOR = {
-  log: 'blue',
+  log: 'green',
   warn: 'yellow',
   error: 'red',
 }
-const _log = (sev = 'log') => (message) => (console[sev])((chalk[SEV_COLOR[sev]])(message))
+const SEV_PRE = {
+  log: '✓',
+  warn: '⚠',
+  error: '✖',
+}
+const _log = (sev = 'log') => m => (console[sev])((chalk[SEV_COLOR[sev]])(`${SEV_PRE[sev]} ${m}`))
 const log = _log()
 const warn = _log('warn')
 const error = _log('error')
+const isGood = m => m.match(R)
+const isBad = m => !isGood(m)
 
 if (require.main === module) {
-  const { argv } = yargs(process.argv.slice(2))
-  const verbose = argv.verbose || argv.v
-  const base = argv.base || argv.b || 'origin/main'
+  const { argv } = yargs(process.argv.slice(2)).options({
+    verbose: {
+      alias: 'v',
+      description: 'verbose/debug flag',
+      type: 'boolean',
+      default: false,
+    },
+    base: {
+      alias: 'b',
+      description: 'base git ref to compare with the current HEAD',
+      type: 'string',
+      default: 'origin/main',
+    },
+    fetch: {
+      description: 'perform a git fetch before commit-watch',
+      type: 'boolean',
+      default: false,
+    },
+  })
 
   if (argv.fetch) {
-    execSync('git fetch --prune')
+    execSync('git fetch')
   }
+
+  const { verbose, base } = argv
 
   try {
     const messages = execSync(`git log --no-merges --format='%s' ${base}..HEAD`, { stdio: 'pipe' }).toString().trim()
@@ -35,11 +60,13 @@ if (require.main === module) {
       process.exit(0)
     }
     const ms = messages.split('\n')
-    const bad = ms.filter(m => !m.match(R))
+    const bad = ms.filter(isBad)
+    const good = ms.filter(isGood)
     if (bad.length) {
       if (verbose) {
         warn(`${bad.length}/${ms.length} do${bad.length === 1 ? 'es' : ''} not match RegExp${R}\n`)
         bad.forEach(m => error(m))
+        good.forEach(m => log(m))
       }
       process.exit(1)
     }
