@@ -34,9 +34,15 @@ if (require.main === module) {
     },
     base: {
       alias: 'b',
-      description: 'base git ref to compare with the current HEAD',
+      description: 'base git ref to compare with the head ref',
       type: 'string',
       default: 'origin/main',
+    },
+    head: {
+      alias: 'h',
+      description: 'head git ref to compare with the base ref',
+      type: 'string',
+      default: 'HEAD',
     },
     fetch: {
       description: 'perform a git fetch before commit-watch',
@@ -49,13 +55,14 @@ if (require.main === module) {
     execSync('git fetch')
   }
 
-  const { verbose, base } = argv
+  const { verbose, base, head } = argv
 
   try {
-    const messages = execSync(`git log --no-merges --format='%s' ${base}..HEAD`, { stdio: 'pipe' }).toString().trim()
+    const gitLog = `git log --no-merges --format='%s' ${base}..${head}`
+    const messages = execSync(gitLog, { stdio: 'pipe' }).toString().trim()
     if (!messages) {
       if (verbose) {
-        log(`No commits between ${base}..HEAD`)
+        log(`No commits between ${base}..${head}`)
       }
       process.exit(0)
     }

@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
 
       - name: Set Node.js version
         uses: actions/setup-node@v2
@@ -34,10 +36,11 @@ jobs:
             ${{ runner.OS }}-${{ matrix.node-version }}-
             ${{ runner.OS }}-
 
-      - run: |
+      - name: dogfood commit-watch check on commit-watch itself
+        run: |
           npm i
           npm link
-          commit-watch -v
+          commit-watch -b ${{ github.event.pull_request.base.sha }} -h ${{ github.event.pull_request.head.sha }} -v
 
   lint:
     runs-on: ubuntu-latest
@@ -64,7 +67,8 @@ jobs:
             ${{ runner.OS }}-${{ matrix.node-version }}-
             ${{ runner.OS }}-
 
-      - run: |
+      - name: lint
+        run: |
           npm i
           npm run lint
 
@@ -104,7 +108,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
         with:
-          ref: master
+          ref: main
           fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
