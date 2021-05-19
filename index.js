@@ -1,9 +1,21 @@
 #!/usr/bin/env node
 const { execSync } = require('child_process')
+
 const yargs = require('yargs/yargs')
+const chalk = require('chalk')
 
 // from @eqworks/release convention
 const R = /(?<cat>\S+?)(\/(?<t2>\S+))? - (?<title>.*)/
+
+const SEV_COLOR = {
+  log: 'blue',
+  warn: 'yellow',
+  error: 'red',
+}
+const _log = (sev = 'log') => (message) => (console[sev])((chalk[SEV_COLOR[sev]])(message))
+const log = _log()
+const warn = _log('warn')
+const error = _log('error')
 
 if (require.main === module) {
   const { argv } = yargs(process.argv.slice(2))
@@ -18,7 +30,7 @@ if (require.main === module) {
     const messages = execSync(`git log --no-merges --format='%s' ${base}..HEAD`, { stdio: 'pipe' }).toString().trim()
     if (!messages) {
       if (verbose) {
-        console.warn(`No commits between ${base}..HEAD`)
+        log(`No commits between ${base}..HEAD`)
       }
       process.exit(0)
     }
@@ -26,20 +38,19 @@ if (require.main === module) {
     const bad = ms.filter(m => !m.match(R))
     if (bad.length) {
       if (verbose) {
-        console.error(`${bad.length}/${ms.length} commit message${bad.length > 1 ? 's' : ''} do${bad.length === 1 ? 'es' : ''} not conform to the convention ${R}\n`)
-        bad.forEach(m => console.error(m))
+        warn(`${bad.length}/${ms.length} do${bad.length === 1 ? 'es' : ''} not match RegExp${R}\n`)
+        bad.forEach(m => error(m))
       }
       process.exit(1)
     }
 
     if (verbose) {
-      console.log('All conforming. Good jorb!')
+      log('All conforming. Good jorb!')
     }
   } catch (e) {
     if (verbose) {
-      console.error(e.message)
+      error(e.message)
     }
     process.exit(1)
   }
-
 }
