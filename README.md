@@ -14,33 +14,17 @@ Then:
 
 ```shell
 % commit-watch --help
-Options:
-      --help     Show help                                             [boolean]
-      --version  Show version number                                   [boolean]
-  -v, --verbose  verbose/debug flag                   [boolean] [default: false]
-  -b, --base     base git ref to compare with the current HEAD
-                                               [string] [default: "origin/main"]
-      --fetch    perform a git fetch before commit-watch
-                                                      [boolean] [default: false]
 ```
 
 If you have `npx` available, you can directly use it without explicit installation:
 
 ```shell
 % npx @eqworks/commit-watch --help
-Options:
-      --help     Show help                                             [boolean]
-      --version  Show version number                                   [boolean]
-  -v, --verbose  verbose/debug flag                   [boolean] [default: false]
-  -b, --base     base git ref to compare with the current HEAD
-                                               [string] [default: "origin/main"]
-      --fetch    perform a git fetch before commit-watch
-                                                      [boolean] [default: false]
 ```
 
 ## Sample usage
 
-This CLI is designed to be used in an automation environment to exit with code 1 (`process.exit(1)`) when there are any mismatches of the commit message (subject line only) convention.
+This CLI is designed to be used in any git repository to exit with code 1 (`process.exit(1)`) when there are any mismatches of the commit message (subject line only) convention.
 
 ```
 category[/sub-category] - subject title
