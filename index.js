@@ -6,21 +6,24 @@ const chalk = require('chalk')
 
 // from @eqworks/release convention
 const R = /(?<cat>\S+?)(\/(?<t2>\S+))? - (?<title>.*)/
-
-const SEV_COLOR = {
-  log: 'green',
+// potentially politically correct spelling not offending english and american-alike
+const SEV_CLR = {
+  log: 'cyan',
+  success: 'green',
   warn: 'yellow',
   error: 'red',
 }
 const SEV_PRE = {
-  log: '✓',
-  warn: '⚠',
-  error: '✖',
+  log: '',
+  success: '✓ ',
+  warn: '⚠ ',
+  error: '✖ ',
 }
-const _log = (sev = 'log') => m => (console[sev])((chalk[SEV_COLOR[sev]])(`${SEV_PRE[sev]} ${m}`))
+const _log = (sev = 'log') => m => (console[sev] || console.log)((chalk[SEV_CLR[sev]])(`${SEV_PRE[sev]}${m}`))
 const log = _log()
 const warn = _log('warn')
 const error = _log('error')
+const success = _log('success')
 const isGood = m => m.match(R)
 const isBad = m => !isGood(m)
 
@@ -71,9 +74,9 @@ if (require.main === module) {
     const good = ms.filter(isGood)
     if (bad.length) {
       if (verbose) {
-        warn(`${bad.length}/${ms.length} do${bad.length === 1 ? 'es' : ''} not match RegExp${R}\n`)
-        bad.forEach(m => error(m))
-        good.forEach(m => log(m))
+        warn(`${bad.length}/${ms.length} do${bad.length === 1 ? 'es' : ''} not match pattern "category[/sub-category] - subject title"\n`)
+        bad.forEach(error)
+        good.forEach(success)
       }
       process.exit(1)
     }
