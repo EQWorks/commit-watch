@@ -18,7 +18,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           scope: '@eqworks'
       - run: npm i # only install once
-      - run: npm publish --access public --tag alpha
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.CD_NPM_TOKEN_PUBLISH }}
 
@@ -27,7 +27,7 @@ jobs:
           node-version: 12.x
           registry-url: https://npm.pkg.github.com/
           scope: '@eqworks'
-      - run: npm publish --access public --tag alpha
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
