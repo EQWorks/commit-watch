@@ -82,7 +82,7 @@ if (require.main === module) {
     }
 
     if (verbose) {
-      log('All conforming. Good jorb!')
+      success('All conforming. Good jorb!')
     }
   } catch (e) {
     if (verbose) {
