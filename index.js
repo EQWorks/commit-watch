@@ -5,7 +5,8 @@ const yargs = require('yargs/yargs')
 const chalk = require('chalk')
 
 // from @eqworks/release convention
-const R = /(?<cat>\S+?)(\/(?<t2>\S+))? - (?<title>.*)/
+const R_GOOD = /(?<cat>\S+?)(\/(?<t2>\S+))? - (?<title>.*)/
+const R_BASE_BRANCH = /^(?<remote>\S+)\/(?<branch>(main|master))$/
 // potentially politically correct spelling not offending english and american-alike
 const SEV_CLR = {
   log: 'cyan',
@@ -24,10 +25,22 @@ const log = _log()
 const warn = _log('warn')
 const error = _log('error')
 const success = _log('success')
-const isGood = m => m.match(R)
+const isGood = m => m.match(R_GOOD)
 const isBad = m => !isGood(m)
 
+const detectBase = () => {
+  const branches = execSync('git branch -r', { stdio: 'pipe' }).toString().trim()
+  const bs = branches.split('\n').map(b => b.trim())
+  for (let b of bs) {
+    if (R_BASE_BRANCH.test(b.trim())) {
+      return b
+    }
+  }
+  return null
+}
+
 if (require.main === module) {
+  const _base = detectBase()
   const { argv } = yargs(process.argv.slice(2)).options({
     verbose: {
       alias: 'v',
@@ -39,7 +52,7 @@ if (require.main === module) {
       alias: 'b',
       description: 'base git ref to compare with the head ref',
       type: 'string',
-      default: 'origin/main',
+      default: _base,
     },
     head: {
       alias: 'h',
@@ -59,6 +72,13 @@ if (require.main === module) {
   }
 
   const { verbose, base, head } = argv
+
+  if (!base) {
+    if (verbose) {
+      error('No base git ref detected or provided')
+    }
+    process.exit(1)
+  }
 
   try {
     const gitLog = `git log --no-merges --format='%s' ${base}..${head}`

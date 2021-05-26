@@ -13,19 +13,19 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-          registry-url: https://registry.npmjs.org/
+          node-version: 14.x
+          registry-url: https://npm.pkg.github.com/
           scope: '@eqworks'
       - run: npm i # only install once
       - run: npm publish --access public --tag alpha
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.CD_NPM_TOKEN_PUBLISH }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-          registry-url: https://npm.pkg.github.com/
+          node-version: 14.x
+          registry-url: https://registry.npmjs.org/
           scope: '@eqworks'
       - run: npm publish --access public --tag alpha
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.CD_NPM_TOKEN_PUBLISH }}
