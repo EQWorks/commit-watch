@@ -50,8 +50,21 @@ and the exit code:
 1
 ```
 
-To use it in an automated/CI environment such as GitHub Actions, check out the `dogfood` job in [this workflow](.github/workflows/main.yml), essentially by pinning down the `--base` and `--head` git refs (in this case, through the given `${{ github }}` context):
+To use it in an automated/CI environment, make sure to pin down the `--base` and `--head` git refs. A generic example in GitHub Actions (in this case, through the given `${{ github }}` context):
 
-```
-commit-watch -b ${{ github.event.pull_request.base.sha }} -h ${{ github.event.pull_request.head.sha }} -v
+```yaml
+jobs:
+  commit-watch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - run: npx @eqworks/commit-watch -b ${{ github.event.pull_request.base.sha }} -h ${{ github.event.pull_request.head.sha }} -v
 ```
